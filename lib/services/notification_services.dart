@@ -24,7 +24,7 @@ class NotifyHelper {
       BehaviorSubject<String>();
 
   /// initializing notification services in android and ios devices with requesting required permissions
-  initializeNotification() async {
+  Future<void> initializeNotification() async {
     tz.initializeTimeZones();
     _configureSelectNotificationSubject();
     await _configureLocalTimeZone();
@@ -52,6 +52,7 @@ class NotifyHelper {
         if (payload != null) {
           debugPrint('notification payload: $payload');
         }
+
         /// hit selectNotificationSubject with notification payload value
         /// and send it to the listener through on select notification method
         selectNotificationSubject.add(payload!);
@@ -132,12 +133,10 @@ class NotifyHelper {
       if (repeat == 'Daily') {
         scheduledDate = tz.TZDateTime(
             tz.local, fd.year, fd.month, fd.day + 1, hour, minutes);
-      }
-      if (repeat == 'Weekly') {
+      }else if (repeat == 'Weekly') {
         scheduledDate = tz.TZDateTime(
             tz.local, fd.year, fd.month, fd.day + 7, hour, minutes);
-      }
-      if (repeat == 'Monthly') {
+      } else if (repeat == 'Monthly') {
         scheduledDate = tz.TZDateTime(
             tz.local, fd.year, fd.month + 1, fd.day, hour, minutes);
       }

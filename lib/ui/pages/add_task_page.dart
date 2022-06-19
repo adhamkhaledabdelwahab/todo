@@ -5,6 +5,7 @@ import 'package:todo/controllers/task_controller.dart';
 import 'package:todo/ui/theme.dart';
 import 'package:todo/ui/widgets/button.dart';
 import 'package:todo/ui/widgets/input_field.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../models/task.dart';
 
@@ -289,22 +290,55 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   _addTaskToDB() async {
     try {
-      int value = await _taskController.addTask(
-        task: Task(
-          title: _titleController.text,
-          note: _noteController.text,
-          isCompleted: 0,
-          date: DateFormat.yMd().format(_selectedDate),
-          startTime: _startTime,
-          endTime: _endTime,
-          color: _selectedColor,
-          repeat: _selectedRepeat,
-          remind: _selectedRemind,
-        ),
+      final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+      var formattedDate =
+          DateFormat.yMd().parse(DateFormat.yMd().format(_selectedDate));
+      var fd = tz.TZDateTime.from(formattedDate, tz.local);
+      var date = DateFormat.jm().parse(_startTime);
+      var myTime = DateFormat('HH:mm').format(date);
+      tz.TZDateTime scheduledDate = tz.TZDateTime(
+        tz.local,
+        fd.year,
+        fd.month,
+        fd.day,
+        int.parse(myTime.split(':')[0]),
+        int.parse(myTime.split(':')[1]),
       );
+      print('scheduled date formatted timezone: $scheduledDate');
+      int value = -1;
+      if (_selectedRepeat == 'None' && scheduledDate.isBefore(now)) {
+        print('selected todo time has passed then it is completed');
+        value = await _taskController.addTask(
+          task: Task(
+            title: _titleController.text,
+            note: _noteController.text,
+            isCompleted: 1,
+            date: DateFormat.yMd().format(_selectedDate),
+            startTime: _startTime,
+            endTime: _endTime,
+            color: _selectedColor,
+            repeat: _selectedRepeat,
+            remind: _selectedRemind,
+          ),
+        );
+      } else {
+        value = await _taskController.addTask(
+          task: Task(
+            title: _titleController.text,
+            note: _noteController.text,
+            isCompleted: 0,
+            date: DateFormat.yMd().format(_selectedDate),
+            startTime: _startTime,
+            endTime: _endTime,
+            color: _selectedColor,
+            repeat: _selectedRepeat,
+            remind: _selectedRemind,
+          ),
+        );
+      }
       print('task id: $value');
     } catch (e) {
-      print('Error');
+      print('Error Message: $e');
     }
   }
 
