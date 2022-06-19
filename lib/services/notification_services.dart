@@ -160,7 +160,7 @@ class NotifyHelper {
     } else if (remind == 20) {
       return scheduledDate.subtract(const Duration(minutes: 20));
     } else {
-      return scheduledDate.subtract(const Duration(minutes: 5));
+      return scheduledDate;
     }
   }
 
