@@ -1,5 +1,6 @@
 import 'package:date_picker_timeline/date_picker_timeline.dart';
 import 'package:flutter/material.dart';
+
 // import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -16,11 +17,14 @@ import '../theme.dart';
 import '../widgets/button.dart';
 import '../widgets/task_tile.dart';
 import 'add_task_page.dart';
+import 'notification_screen.dart';
 
 /// home page screen that displays tasks retrieved from the database
 /// and using GetX controller to update if needed
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key, this.payload}) : super(key: key);
+
+  final String? payload;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -36,6 +40,14 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     notifyHelper.initializeNotification();
     _taskController.getTasks();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (widget.payload != null) {
+        debugPrint('My payload is ${widget.payload}');
+        Get.to(() => NotificationScreen(
+              payload: widget.payload!,
+            ));
+      }
+    });
   }
 
   @override
